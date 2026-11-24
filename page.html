@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Revisão Pintarelli ERP</title>
+<style>
+/* Uma coluna de leitura: resumo no topo, índice de módulos, depois cada módulo com seus itens conferíveis. */
+:root {
+  --bg: #f3f3f8;
+  --surface: #ffffff;
+  --ink: #1c1a33;
+  --muted: #65637c;
+  --line: #dcdbe8;
+  --brand: #292254;
+  --brand-ink: #ffffff;
+  --accent: #bd1530;
+  --ok: #17754a;
+  --ok-bg: #dff3e8;
+  --change: #9a4a08;
+  --change-bg: #fdecd2;
+  --open-bg: #ebe9f8;
+  --display: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  --body: 'Segoe UI', system-ui, -apple-system, Roboto, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121120; --surface: #1b1a2c; --ink: #eceaf7; --muted: #a2a0ba; --line: #302e47;
+    --brand: #b9b1ee; --brand-ink: #17152a; --accent: #f0667c;
+    --ok: #62d49d; --ok-bg: #153527; --change: #f1b467; --change-bg: #3b2b12; --open-bg: #262442;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121120; --surface: #1b1a2c; --ink: #eceaf7; --muted: #a2a0ba; --line: #302e47;
+  --brand: #b9b1ee; --brand-ink: #17152a; --accent: #f0667c;
+  --ok: #62d49d; --ok-bg: #153527; --change: #f1b467; --change-bg: #3b2b12; --open-bg: #262442;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.55 var(--body);
+  padding-block: 28px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 880px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px; }
+h1, h2, h3, p { margin: 0; }
+h1 { font: 600 28px/1.15 var(--display); letter-spacing: -0.01em; text-wrap: balance; }
+h2 { font: 600 20px/1.2 var(--display); text-wrap: balance; }
+h3 { font: 600 15px/1.35 var(--body); }
+.eyebrow { font-size: 11.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+.lead { color: var(--muted); max-width: 65ch; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, textarea:focus-visible, a:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+.head { display: flex; flex-direction: column; gap: 8px; }
+
+/* resumo */
+.summary { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+.summary__row { display: flex; flex-wrap: wrap; gap: 8px 28px; }
+.stat { display: flex; flex-direction: column; min-width: 120px; }
+.stat b { font: 600 24px/1.1 var(--display); font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12.5px; color: var(--muted); }
+.bar { height: 8px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--ok); border-radius: 99px; transition: width 0.3s; }
+.notice { font-size: 13.5px; padding: 10px 14px; border-radius: 8px; background: var(--change-bg); color: var(--change); }
+
+/* filtros e índice */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 99px; padding: 6px 13px; font-size: 13px; font-weight: 500; }
+.chip[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+.index { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 6px 18px; }
+.index button { display: flex; justify-content: space-between; gap: 10px; width: 100%; padding: 6px 0; background: none; border: 0; border-bottom: 1px solid var(--line); text-align: left; font-size: 13.5px; }
+.index button span:last-child { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.index button:hover span:first-child { text-decoration: underline; }
+
+/* módulo */
+.module { display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 16px; }
+.module__head { display: flex; flex-direction: column; gap: 6px; padding-top: 10px; border-top: 2px solid var(--brand); }
+.module__title { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.module__where { font-size: 12.5px; color: var(--muted); }
+.pill { font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 99px; white-space: nowrap; }
+.pill--feito { background: var(--ok-bg); color: var(--ok); }
+.pill--parcial { background: var(--change-bg); color: var(--change); }
+.pill--planejado { background: var(--open-bg); color: var(--muted); }
+.pill--open { background: var(--open-bg); color: var(--brand); }
+
+/* item */
+.items { display: flex; flex-direction: column; gap: 10px; list-style: none; margin: 0; padding: 0; }
+.item { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.item[data-mine="ok"] { border-left: 4px solid var(--ok); }
+.item[data-mine="change"] { border-left: 4px solid var(--change); }
+.item__top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+.item__detail { color: var(--muted); font-size: 14px; max-width: 68ch; overflow-wrap: anywhere; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 14px; font-size: 13.5px; font-weight: 600; min-height: 38px; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn--ok[aria-pressed="true"] { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); }
+.btn--change[aria-pressed="true"] { background: var(--change-bg); border-color: var(--change); color: var(--change); }
+.btn--primary { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+.btn--quiet { border-color: transparent; background: none; color: var(--muted); font-weight: 500; padding-inline: 8px; }
+.draft { display: flex; flex-direction: column; gap: 8px; }
+.draft label { font-size: 13px; font-weight: 600; }
+.draft textarea { width: 100%; min-height: 84px; resize: vertical; font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.error { color: var(--accent); font-size: 13px; }
+.team { display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.team__ok { color: var(--ok); }
+.team__change { display: flex; flex-direction: column; gap: 2px; padding: 8px 12px; border-radius: 8px; background: var(--change-bg); color: var(--ink); overflow-wrap: anywhere; }
+.team__change b { color: var(--change); font-size: 12.5px; }
+.empty { background: var(--surface); border: 1px dashed var(--line); border-radius: 12px; padding: 32px 24px; text-align: center; color: var(--muted); }
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); max-width: calc(100% - 32px); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 8px; font-size: 13.5px; z-index: 20; }
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+
+.who { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
+.who label { display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600; flex: 1 1 220px; min-width: 0; }
+.who input { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; min-height: 38px; width: 100%; }
+.who input:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.who__hint { flex-basis: 100%; font-size: 12.5px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="head">
+    <span class="eyebrow">Pintarelli ERP · revisão da equipe</span>
+    <h1>O que já foi construído está de acordo?</h1>
+    <p class="lead">Cada item descreve como o sistema funciona hoje. Marque <b>De acordo</b> ou <b>Precisa mudar</b> e, nesse caso, escreva o que deve ser diferente. Itens com a marca “Decisão pendente” ainda não existem e dependem da resposta de vocês.</p>
+  </header>
+
+  <section class="summary" aria-label="Resumo">
+    <form class="who" id="who">
+      <label for="who-code">Seu código de 8 dígitos
+        <input id="who-code" name="code" inputmode="numeric" pattern="[0-9]{8}" maxlength="8" autocomplete="off" placeholder="00000000" required>
+      </label>
+      <button class="btn btn--primary" type="submit" id="who-save">Entrar</button>
+      <span class="who__hint" id="who-hint">Digite o código que você recebeu para responder. Sem ele, você consegue ler, mas não marcar.</span>
+    </form>
+    <div class="summary__row">
+      <div class="stat"><b id="stat-mine">–</b><span>itens que você já respondeu</span></div>
+      <div class="stat"><b id="stat-change">–</b><span>itens com pedido de mudança</span></div>
+      <div class="stat"><b id="stat-people">–</b><span>pessoas que já responderam</span></div>
+    </div>
+    <div class="bar" role="progressbar" aria-label="Seu progresso" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress"><i id="progress-fill"></i></div>
+    <p class="notice" id="notice" hidden></p>
+  </section>
+
+  <div class="chips" role="group" aria-label="Filtrar itens" id="filters">
+    <button class="chip" type="button" data-filter="all" aria-pressed="true">Todos</button>
+    <button class="chip" type="button" data-filter="todo" aria-pressed="false">Falta eu responder</button>
+    <button class="chip" type="button" data-filter="change" aria-pressed="false">Com pedido de mudança</button>
+    <button class="chip" type="button" data-filter="open" aria-pressed="false">Decisão pendente</button>
+  </div>
+
+  <nav class="index" aria-label="Módulos" id="index"></nav>
+
+  <main id="modules">
+    <div class="empty" id="empty">Carregando os módulos…</div>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+<script>
+(function () {
+  'use strict'
+
+  var STATUS = { feito: 'Feito', parcial: 'Parcial', planejado: 'Planejado' }
+  var POLL_MS = 15000
+  var base = location.pathname.replace(/\/+$/, '')
+  var state = {
+    secret: null, me: null,     // me: { id, name }
+    modules: [], loaded: false,
+    people: {},                 // id -> nome
+    reviews: {},                // id -> { itemId: {status, note} }
+    mine: {},                   // minhas respostas (estado local, otimista)
+    drafts: {},                 // itemId -> { text, error }
+    filter: 'all',
+    pending: 0,
+    lastPayload: '',
+  }
+  var $ = function (id) { return document.getElementById(id) }
+  var chain = Promise.resolve()
+  var toastTimer = null
+
+  /** O código pessoal fica guardado neste navegador para não ser pedido de novo. */
+  function loadSecret() {
+    try { return localStorage.getItem('pb-revisao-code') } catch (e) { return null }
+  }
+  function storeSecret(code) {
+    try {
+      if (code) localStorage.setItem('pb-revisao-code', code)
+      else localStorage.removeItem('pb-revisao-code')
+    } catch (e) {}
+  }
+
+  function api(method, path, body) {
+    return fetch(base + '/api/' + path, {
+      method: method,
+      headers: { 'content-type': 'application/json', 'x-person': state.secret || '' },
+      body: body === undefined ? undefined : JSON.stringify(body),
+      cache: 'no-store',
+    }).then(function (response) {
+      return response.json().catch(function () { return null }).then(function (data) {
+        if (!response.ok) throw new Error((data && data.message) || 'Não foi possível concluir.')
+        return data
+      })
+    }, function () {
+      throw new Error('Sem conexão. Sua resposta não foi salva.')
+    })
+  }
+
+  function el(tag, attrs, children) {
+    var node = document.createElement(tag)
+    for (var key in attrs || {}) {
+      var value = attrs[key]
+      if (value === null || value === undefined || value === false) continue
+      if (key === 'class') node.className = value
+      else if (key === 'text') node.textContent = value
+      else if (key.slice(0, 2) === 'on') node.addEventListener(key.slice(2), value)
+      else node.setAttribute(key, value === true ? '' : value)
+    }
+    ;(children || []).forEach(function (child) { if (child) node.appendChild(child) })
+    return node
+  }
+
+  function toast(message) {
+    clearTimeout(toastTimer)
+    $('toast').textContent = message
+    $('toast').hidden = false
+    toastTimer = setTimeout(function () { $('toast').hidden = true }, 5000)
+  }
+
+  function notice(message) {
+    $('notice').textContent = message || ''
+    $('notice').hidden = !message
+  }
+
+  function answersFor(itemId) {
+    var list = []
+    var myId = state.me ? String(state.me.id) : null
+    for (var id in state.reviews) {
+      if (id === myId) continue
+      var answer = state.reviews[id][itemId]
+      if (answer) list.push({ id: id, status: answer.status, note: answer.note })
+    }
+    if (state.mine[itemId]) list.push({ id: myId, mine: true, status: state.mine[itemId].status, note: state.mine[itemId].note })
+    return list
+  }
+
+  function nameOf(answer) {
+    return answer.mine ? 'Você' : state.people[answer.id] || 'Alguém'
+  }
+
+  function visible(item) {
+    if (state.filter === 'todo') return !state.mine[item.id]
+    if (state.filter === 'open') return !!item.open
+    if (state.filter === 'change') return answersFor(item.id).some(function (a) { return a.status === 'change' })
+    return true
+  }
+
+  function needName() {
+    if (state.me) return false
+    notice('Informe seu código de 8 dígitos no campo acima para responder.')
+    $('who-code').focus()
+    return true
+  }
+
+  /** Aplica na tela e envia ao servidor; se o envio falhar, volta ao que estava. */
+  function answer(itemId, status, note) {
+    if (needName()) return
+    var before = state.mine[itemId]
+    if (status === null) delete state.mine[itemId]
+    else state.mine[itemId] = { status: status, note: note || '' }
+    delete state.drafts[itemId]
+    state.pending++
+    render()
+    chain = chain.then(function () {
+      return api('PUT', 'answer', { item: itemId, status: status, note: note || '' })
+    }).catch(function (error) {
+      if (before) state.mine[itemId] = before
+      else delete state.mine[itemId]
+      toast(error.message)
+    }).then(function () {
+      state.pending--
+      render()
+    })
+  }
+
+  function renderItem(item) {
+    var mine = state.mine[item.id]
+    var draft = state.drafts[item.id]
+    var answers = answersFor(item.id)
+    var oks = answers.filter(function (a) { return a.status === 'ok' })
+    var changes = answers.filter(function (a) { return a.status === 'change' })
+
+    var actions = el('div', { class: 'actions' }, [
+      el('button', {
+        class: 'btn btn--ok', type: 'button',
+        'aria-pressed': mine && mine.status === 'ok' ? 'true' : 'false', text: 'De acordo',
+        onclick: function () { answer(item.id, 'ok') },
+      }),
+      el('button', {
+        class: 'btn btn--change', type: 'button',
+        'aria-pressed': mine && mine.status === 'change' ? 'true' : 'false', text: 'Precisa mudar',
+        onclick: function () {
+          if (needName()) return
+          state.drafts[item.id] = { text: mine && mine.status === 'change' ? mine.note : '', error: '' }
+          render()
+          var area = $('note-' + item.id)
+          if (area) area.focus()
+        },
+      }),
+      mine && !draft ? el('button', {
+        class: 'btn btn--quiet', type: 'button', text: 'Desfazer minha resposta',
+        onclick: function () { answer(item.id, null) },
+      }) : null,
+    ])
+
+    var draftBox = null
+    if (draft) {
+      var area = el('textarea', { id: 'note-' + item.id, maxlength: '1500', placeholder: 'Descreva como deveria funcionar.' })
+      area.value = draft.text
+      area.addEventListener('input', function () { draft.text = area.value })
+      draftBox = el('div', { class: 'draft' }, [
+        el('label', { for: 'note-' + item.id, text: 'O que precisa mudar?' }),
+        area,
+        draft.error ? el('p', { class: 'error', role: 'alert', text: draft.error }) : null,
+        el('div', { class: 'actions' }, [
+          el('button', {
+            class: 'btn btn--primary', type: 'button', text: 'Salvar pedido de mudança',
+            onclick: function () {
+              var text = draft.text.trim()
+              if (!text) { draft.error = 'Escreva o que deve mudar antes de salvar.'; render(); return }
+              answer(item.id, 'change', text)
+            },
+          }),
+          el('button', { class: 'btn btn--quiet', type: 'button', text: 'Cancelar', onclick: function () { delete state.drafts[item.id]; render() } }),
+        ]),
+      ])
+    }
+
+    var team = null
+    if (answers.length) {
+      team = el('div', { class: 'team' }, [
+        oks.length ? el('span', { class: 'team__ok', text: 'De acordo (' + oks.length + '): ' + oks.map(nameOf).join(', ') }) : null,
+      ].concat(changes.map(function (a) {
+        return el('div', { class: 'team__change' }, [
+          el('b', { text: nameOf(a) + ' pediu mudança' }),
+          el('span', { text: a.note }),
+        ])
+      })))
+    }
+
+    return el('li', { class: 'item', 'data-mine': mine ? mine.status : null }, [
+      el('div', { class: 'item__top' }, [
+        el('h3', { text: item.title }),
+        item.open ? el('span', { class: 'pill pill--open', text: 'Decisão pendente' }) : null,
+      ]),
+      el('p', { class: 'item__detail', text: item.detail }),
+      actions,
+      draftBox,
+      team,
+    ])
+  }
+
+  function render() {
+    var active = document.activeElement
+    var focusId = active && active.id && active.id.indexOf('note-') === 0 ? active.id : null
+    var caret = focusId ? active.selectionStart : 0
+
+    var allItems = []
+    state.modules.forEach(function (m) { m.items.forEach(function (i) { allItems.push(i) }) })
+    var total = allItems.length
+    var mineCount = allItems.filter(function (i) { return state.mine[i.id] }).length
+    var changeCount = allItems.filter(function (i) { return answersFor(i.id).some(function (a) { return a.status === 'change' }) }).length
+    var myId = state.me ? String(state.me.id) : null
+    var people = Object.keys(state.reviews).filter(function (id) { return id !== myId && Object.keys(state.reviews[id]).length }).length
+    if (Object.keys(state.mine).length) people++
+
+    $('stat-mine').textContent = total ? mineCount + ' de ' + total : '–'
+    $('stat-change').textContent = total ? String(changeCount) : '–'
+    $('stat-people').textContent = total ? String(people) : '–'
+    var percent = total ? Math.round((mineCount / total) * 100) : 0
+    $('progress-fill').style.width = percent + '%'
+    $('progress').setAttribute('aria-valuenow', String(percent))
+
+    var index = $('index')
+    index.textContent = ''
+    var container = $('modules')
+    container.textContent = ''
+    if (!state.modules.length) {
+      container.appendChild(el('div', { class: 'empty', text: state.loaded ? 'Não foi possível carregar os módulos. Recarregue a página.' : 'Carregando os módulos…' }))
+      return
+    }
+
+    var shown = 0
+    var list = el('div', { class: 'wrap' })
+    state.modules.forEach(function (m) {
+      var done = m.items.filter(function (i) { return state.mine[i.id] }).length
+      index.appendChild(el('button', { type: 'button', onclick: function () {
+        var target = $('mod-' + m.id)
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      } }, [el('span', { text: m.name }), el('span', { text: done + '/' + m.items.length })]))
+
+      var visibleItems = m.items.filter(visible)
+      if (!visibleItems.length) return
+      shown += visibleItems.length
+      list.appendChild(el('section', { class: 'module', id: 'mod-' + m.id }, [
+        el('div', { class: 'module__head' }, [
+          el('div', { class: 'module__title' }, [
+            el('h2', { text: m.name }),
+            el('span', { class: 'pill pill--' + m.status, text: STATUS[m.status] || m.status }),
+          ]),
+          el('p', { class: 'lead', text: m.summary }),
+          el('p', { class: 'module__where', text: m.where }),
+        ]),
+        el('ul', { class: 'items' }, visibleItems.map(renderItem)),
+      ]))
+    })
+    if (!shown) list.appendChild(el('div', { class: 'empty', text: 'Nenhum item neste filtro.' }))
+    container.appendChild(list)
+
+    if (focusId && $(focusId)) {
+      $(focusId).focus()
+      try { $(focusId).setSelectionRange(caret, caret) } catch (e) {}
+    }
+  }
+
+  function renderWho() {
+    var known = !!state.me
+    $('who-code').parentElement.hidden = known
+    $('who-code').required = !known
+    $('who-save').textContent = known ? 'Sair / trocar código' : 'Entrar'
+    $('who-hint').textContent = known
+      ? 'Respondendo como ' + state.me.name + '.'
+      : 'Digite o código que você recebeu para responder. Sem ele, você consegue ler, mas não marcar.'
+  }
+
+  function apply(data) {
+    var payload = JSON.stringify(data)
+    var changed = payload !== state.lastPayload
+    state.lastPayload = payload
+    state.loaded = true
+    if (!changed) return
+    state.modules = data.modules
+    state.me = data.me
+    state.people = {}
+    data.people.forEach(function (person) { state.people[String(person.id)] = person.name })
+    state.reviews = {}
+    data.answers.forEach(function (a) {
+      var id = String(a.person)
+      ;(state.reviews[id] = state.reviews[id] || {})[a.item] = { status: a.status, note: a.note }
+    })
+    // Enquanto há respostas minhas a caminho, a tela vale mais que o servidor.
+    if (state.pending === 0) {
+      state.mine = state.me ? JSON.parse(JSON.stringify(state.reviews[String(state.me.id)] || {})) : {}
+    }
+    renderWho()
+    render()
+  }
+
+  function refresh() {
+    return api('GET', 'state').then(function (data) {
+      if ($('notice').textContent.indexOf('carregar') >= 0) notice('')
+      apply(data)
+    }).catch(function () {
+      state.loaded = true
+      if (!state.modules.length) render()
+      notice('Não foi possível carregar as respostas agora. A página continua tentando.')
+    })
+  }
+
+  $('who').addEventListener('submit', function (event) {
+    event.preventDefault()
+    if (state.me) {
+      state.secret = null
+      storeSecret(null)
+      state.me = null
+      state.mine = {}
+      state.lastPayload = ''
+      $('who-code').value = ''
+      renderWho()
+      refresh()
+      return
+    }
+    var code = $('who-code').value.replace(/\D/g, '')
+    if (code.length !== 8) { toast('O código tem 8 dígitos.'); return }
+    var previous = state.secret
+    state.secret = code
+    $('who-save').disabled = true
+    api('PUT', 'me').then(function () {
+      storeSecret(code)
+      state.lastPayload = ''
+      notice('')
+      return refresh()
+    }).catch(function (error) {
+      state.secret = previous
+      toast(error.message)
+    }).then(function () { $('who-save').disabled = false })
+  })
+
+  document.querySelectorAll('#filters .chip').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      state.filter = chip.dataset.filter
+      document.querySelectorAll('#filters .chip').forEach(function (other) {
+        other.setAttribute('aria-pressed', other === chip ? 'true' : 'false')
+      })
+      render()
+    })
+  })
+
+  state.secret = loadSecret()
+  refresh()
+  setInterval(function () { if (!document.hidden && state.pending === 0) refresh() }, POLL_MS)
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && state.pending === 0) refresh() })
+})()
+
+</script>
+</body>
+</html>
